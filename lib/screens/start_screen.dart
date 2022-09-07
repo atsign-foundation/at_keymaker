@@ -167,6 +167,12 @@ class DoOnboardWidget extends StatelessWidget {
             );
             break;
           case AtOnboardingResultStatus.cancel:
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const StartScreen(
+                        // futurePreference: this.futurePreference,
+                        )));
             break;
         }
       },
