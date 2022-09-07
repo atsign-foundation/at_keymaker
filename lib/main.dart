@@ -19,7 +19,7 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-  // * load the AtClientPreference in the background
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

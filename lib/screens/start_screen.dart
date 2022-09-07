@@ -147,6 +147,7 @@ class DoOnboardWidget extends StatelessWidget {
             domain: AtEnv.rootDomain,
             appAPIKey: AtEnv.appApiKey,
           ),
+          isSwitchingAtsign: true,
         );
         switch (onboardingResult.status) {
           case AtOnboardingResultStatus.success:
@@ -166,6 +167,12 @@ class DoOnboardWidget extends StatelessWidget {
             );
             break;
           case AtOnboardingResultStatus.cancel:
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const StartScreen(
+                        // futurePreference: this.futurePreference,
+                        )));
             break;
         }
       },
