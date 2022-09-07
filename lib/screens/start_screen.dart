@@ -147,6 +147,7 @@ class DoOnboardWidget extends StatelessWidget {
             domain: AtEnv.rootDomain,
             appAPIKey: AtEnv.appApiKey,
           ),
+          isSwitchingAtsign: true,
         );
         switch (onboardingResult.status) {
           case AtOnboardingResultStatus.success:
