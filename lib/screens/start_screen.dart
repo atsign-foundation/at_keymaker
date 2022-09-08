@@ -18,8 +18,7 @@ class StartScreen extends StatefulWidget {
 
 class _StartScreenState extends State<StartScreen> {
   // * load the list of existing Atsigns in the background
-  Future<List<String>> _futureAtsignList =
-      KeyChainManager.getInstance().getAtSignListFromKeychain();
+  KeyChainManager _keyChainManager = KeyChainManager.getInstance();
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,7 @@ class _StartScreenState extends State<StartScreen> {
       ),
       body: Builder(
           builder: (context) => FutureBuilder<List<String>>(
-              future: _futureAtsignList,
+              future: _keyChainManager.getAtSignListFromKeychain(),
               builder:
                   (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
                 List<Widget> children;
@@ -50,23 +49,61 @@ class _StartScreenState extends State<StartScreen> {
                         //     vertical: 5, horizontal: 20),
                         itemCount: atSigns!.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(color: Colors.blue, width: 1),
-                                borderRadius: BorderRadius.circular(10)),
-                            title: Text(atSigns[index]),
-                            trailing: Icon(Icons.navigate_next),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => SecretsListScreen(
-                                    atSign: atSigns[index],
-                                    // futurePreference: widget.futurePreference,
+                          final atSign = atSigns[index];
+                          return Dismissible(
+                            key: Key(atSign),
+                            background: Container(
+                              color: Colors.red,
+                              child: Align(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 16),
+                                    child: Icon(Icons.delete),
                                   ),
-                                ),
-                              );
+                                  alignment: Alignment.centerRight),
+                            ),
+                            confirmDismiss: (direction) async {
+                              if (direction == DismissDirection.startToEnd) {
+                                return false;
+                              } else {
+                                bool delete = true;
+                                final snackbarController =
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Delete $atSign ?'),
+                                    action: SnackBarAction(
+                                        label: 'Cancel',
+                                        onPressed: () => delete = false),
+                                  ),
+                                );
+                                await snackbarController.closed;
+                                return delete;
+                              }
                             },
+                            onDismissed: (_) {
+                              setState(() {
+                                _keyChainManager
+                                    .deleteAtSignFromKeychain(atSign);
+                                atSigns.removeAt(index);
+                              });
+                            },
+                            child: ListTile(
+                              shape: RoundedRectangleBorder(
+                                  side:
+                                      BorderSide(color: Colors.blue, width: 1),
+                                  borderRadius: BorderRadius.circular(10)),
+                              title: Text(atSigns[index]),
+                              trailing: Icon(Icons.navigate_next),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => SecretsListScreen(
+                                      atSign: atSigns[index],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           );
                         }),
                   ];
