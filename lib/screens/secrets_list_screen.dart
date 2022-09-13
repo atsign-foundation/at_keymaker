@@ -27,7 +27,7 @@ class _SecretsListScreenState extends State<SecretsListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Secrets for ${widget.atSign}!',
+        title: Text('${widget.atSign}',
             style: TextStyle(
               overflow: TextOverflow.ellipsis,
               fontSize: 18,
@@ -51,9 +51,9 @@ class _SecretsListScreenState extends State<SecretsListScreen> {
                 future: _keyChainManager.getPkamPublicKey(widget.atSign),
                 builder:
                     (BuildContext context, AsyncSnapshot<String?> snapshot) {
-                  String keyString = 'no keys found';
+                  String keyString = 'no key found';
                   if (snapshot.hasData) {
-                    keyString = snapshot.data!;
+                    if (snapshot.data!.isNotEmpty) keyString = snapshot.data!;
                   } else if (snapshot.hasError) {
                     keyString = snapshot.error.toString();
                   }
@@ -82,9 +82,9 @@ class _SecretsListScreenState extends State<SecretsListScreen> {
                 future: _keyChainManager.getPkamPrivateKey(widget.atSign),
                 builder:
                     (BuildContext context, AsyncSnapshot<String?> snapshot) {
-                  String keyString = 'no keys found';
+                  String keyString = 'no key found';
                   if (snapshot.hasData) {
-                    keyString = snapshot.data!;
+                    if (snapshot.data!.isNotEmpty) keyString = snapshot.data!;
                   } else if (snapshot.hasError) {
                     keyString = snapshot.error.toString();
                   }
@@ -122,9 +122,9 @@ class _SecretsListScreenState extends State<SecretsListScreen> {
                 future: _keyChainManager.getEncryptionPublicKey(widget.atSign),
                 builder:
                     (BuildContext context, AsyncSnapshot<String?> snapshot) {
-                  String keyString = 'no keys found';
+                  String keyString = 'no key found';
                   if (snapshot.hasData) {
-                    keyString = snapshot.data!;
+                    if (snapshot.data!.isNotEmpty) keyString = snapshot.data!;
                   } else if (snapshot.hasError) {
                     keyString = snapshot.error.toString();
                   }
@@ -153,9 +153,9 @@ class _SecretsListScreenState extends State<SecretsListScreen> {
                 future: _keyChainManager.getEncryptionPrivateKey(widget.atSign),
                 builder:
                     (BuildContext context, AsyncSnapshot<String?> snapshot) {
-                  String keyString = 'no keys found';
+                  String keyString = 'no key found';
                   if (snapshot.hasData) {
-                    keyString = snapshot.data!;
+                    if (snapshot.data!.isNotEmpty) keyString = snapshot.data!;
                   } else if (snapshot.hasError) {
                     keyString = snapshot.error.toString();
                   }
@@ -190,9 +190,9 @@ class _SecretsListScreenState extends State<SecretsListScreen> {
                 future: _keyChainManager.getSelfEncryptionAESKey(widget.atSign),
                 builder:
                     (BuildContext context, AsyncSnapshot<String?> snapshot) {
-                  String keyString = 'no keys found';
+                  String keyString = 'no key found';
                   if (snapshot.hasData) {
-                    keyString = snapshot.data!;
+                    if (snapshot.data!.isNotEmpty) keyString = snapshot.data!;
                   } else if (snapshot.hasError) {
                     keyString = snapshot.error.toString();
                   }
@@ -223,47 +223,15 @@ class _SecretsListScreenState extends State<SecretsListScreen> {
                 color: Colors.black,
               )),
           ListTile(
-            title: Text('Bootstrap Shared Secret'),
-            subtitle: FutureBuilder<String?>(
-                future: _keyChainManager.getCramSecret(widget.atSign),
-                builder:
-                    (BuildContext context, AsyncSnapshot<String?> snapshot) {
-                  String keyString = 'no keys found';
-                  if (snapshot.hasData) {
-                    keyString = snapshot.data!;
-                  } else if (snapshot.hasError) {
-                    keyString = snapshot.error.toString();
-                  }
-                  return Text(keyString,
-                      style: TextStyle(
-                        overflow: TextOverflow.ellipsis,
-                        fontSize: 14,
-                        color: Colors.black,
-                      ));
-                }),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AtSecretValueScreen(
-                    atSign: widget.atSign,
-                    atSecretType: AtSecretType.bootstrapSharedSecret,
-                    // futurePreference: widget.futurePreference,
-                  ),
-                ),
-              );
-            },
-          ),
-          ListTile(
             title: Text('Local Persistence Encryption Secret'),
             subtitle: FutureBuilder<List<int>?>(
                 future: _keyChainManager.getKeyStoreSecret(widget.atSign),
                 builder:
                     (BuildContext context, AsyncSnapshot<List<int>?> snapshot) {
-                  String keyString = 'no keys found';
+                  String keyString = 'no key found';
                   if (snapshot.hasData) {
                     List<int>? charCodes = snapshot.data;
-                    keyString = charCodes.toString();
+                    if (charCodes!.isNotEmpty) keyString = charCodes.toString();
                   } else if (snapshot.hasError) {
                     keyString = snapshot.error.toString();
                   }
@@ -281,6 +249,39 @@ class _SecretsListScreenState extends State<SecretsListScreen> {
                   builder: (context) => AtSecretValueScreen(
                     atSign: widget.atSign,
                     atSecretType: AtSecretType.dataPersistenceKey,
+                    // futurePreference: widget.futurePreference,
+                  ),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            title: Text('Bootstrap Shared Secret'),
+            subtitle: FutureBuilder<String?>(
+                future: _keyChainManager.getCramSecret(widget.atSign),
+                builder:
+                    (BuildContext context, AsyncSnapshot<String?> snapshot) {
+                  String keyString =
+                      'Bootstrap complete, secret has been deleted';
+                  if (snapshot.hasData) {
+                    if (snapshot.data!.isNotEmpty) keyString = snapshot.data!;
+                  } else if (snapshot.hasError) {
+                    keyString = snapshot.error.toString();
+                  }
+                  return Text(keyString,
+                      style: TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        fontSize: 14,
+                        color: Colors.black,
+                      ));
+                }),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AtSecretValueScreen(
+                    atSign: widget.atSign,
+                    atSecretType: AtSecretType.bootstrapSharedSecret,
                     // futurePreference: widget.futurePreference,
                   ),
                 ),
