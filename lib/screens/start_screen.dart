@@ -176,26 +176,25 @@ class DoOnboardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
+        AtOnboardingConfig atOnboardingConfig = AtOnboardingConfig(
+          atClientPreference: await loadAtClientPreference(),
+          rootEnvironment: AtEnv.rootEnvironment,
+          domain: AtEnv.rootDomain,
+          appAPIKey: AtEnv.appApiKey,
+        );
         AtOnboardingResult onboardingResult = await AtOnboarding.onboard(
           context: context,
-          config: AtOnboardingConfig(
-            atClientPreference: await loadAtClientPreference(),
-            rootEnvironment: AtEnv.rootEnvironment,
-            domain: AtEnv.rootDomain,
-            appAPIKey: AtEnv.appApiKey,
-          ),
+          config: atOnboardingConfig,
           isSwitchingAtsign: true,
         );
         switch (onboardingResult.status) {
           case AtOnboardingResultStatus.success:
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const StartScreen(
-                        // futurePreference: this.futurePreference,
-                        )));
+            AtOnboarding.reset(context: context, config: atOnboardingConfig);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const StartScreen()));
             break;
           case AtOnboardingResultStatus.error:
+            AtOnboarding.reset(context: context, config: atOnboardingConfig);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 backgroundColor: Colors.red,
@@ -204,6 +203,7 @@ class DoOnboardWidget extends StatelessWidget {
             );
             break;
           case AtOnboardingResultStatus.cancel:
+            AtOnboarding.reset(context: context, config: atOnboardingConfig);
             Navigator.push(
                 context,
                 MaterialPageRoute(
